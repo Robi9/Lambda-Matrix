@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  matmult
+  
+  Sample SAM Template for matmult
+
+Globals:
+  Function:
+    Timeout: 600
+    MemorySize: 6144
+
+Resources:
+  MultFunctionGo:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: multgo/
+      Handler: multgo
+      Runtime: go1.x
+      Tracing: Active 
+      Policies:
+         - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: /multgo
+            Method: POST
+      Environment: 
+        Variables:
+          TABLEARN: !GetAtt ResultsTable.Arn
+  MultFunctionGoNum:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: gonum/
+      Handler: multgo
+      Runtime: go1.x
+      Tracing: Active 
+      Policies:
+         - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: /gonum
+            Method: POST
+      Environment: 
+        Variables:
+          TABLEARN: !GetAtt ResultsTable.Arn
+  MultFunctionPython:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: multpython/
+      Handler: main.lambda_handler 
+      Runtime: python3.8 
+      Tracing: Active 
+      Policies:
+         - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: /multpython
+            Method: POST
+      Environment: 
+        Variables:
+          TABLEARN: !GetAtt ResultsTable.Arn
+  MultFunctionNumpy:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: numpy/
+      Handler: main.lambda_handler 
+      Runtime: python3.8 
+      Tracing: Active 
+      Policies:
+         - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: /numpy
+            Method: POST
+      Environment: 
+        Variables:
+          TABLEARN: !GetAtt ResultsTable.Arn
+          
+  ResultFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: result/
+      Handler: result
+      Runtime: go1.x
+      Tracing: Active 
+      Policies:
+         - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+      Events:
+        CatchAll:
+          Type: Api 
+          Properties:
+            Path: /result/{id}
+            Method: GET
+      Environment: 
+        Variables:
+          TABLEARN: !GetAtt ResultsTable.Arn
+  ResultsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+          Name: id
+          Type: String
+
+Outputs:
+   MultAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
