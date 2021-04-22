@@ -1,5 +1,7 @@
 # matmult
 
+In this project, 04 AWS lambdas functions were built in which they were developed respectively in pure Go, pure Python, Go using the GoNum library and Python with the NumPy library. The functions present the matrix multiplication algorithm. The four functions were part of an experiment carried out, in which the purpose was to evaluate the performance of the Go and Python languages with high performance applications in a serverless paradigm on the AWS platform.
+
 This is a sample template for matmult - Below is a brief explanation of what we have generated for you:
 
 ```bash
